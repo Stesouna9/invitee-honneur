@@ -1,0 +1,286 @@
+/* ── CHEZ NONO ─────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: "Courier New", Courier, monospace;
+  color: #cfcfcf;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#game { position: fixed; inset: 0; display: block; }
+
+.overlay {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  background: #000;
+  z-index: 50;
+  padding: 24px;
+}
+.hidden { display: none !important; }
+
+/* ── Menu ── */
+#menu h1 {
+  font-size: clamp(42px, 9vw, 96px);
+  letter-spacing: 0.12em;
+  color: #e8b23a;
+  text-shadow: 0 0 18px rgba(232, 178, 58, 0.35), 3px 3px 0 #4a2c0a;
+  font-weight: 900;
+}
+#menu h1 span { color: #b03030; }
+#menu .sous-titre {
+  margin-top: 8px;
+  color: #777;
+  font-size: clamp(13px, 2.2vw, 18px);
+  letter-spacing: 0.35em;
+}
+#menu .boutons { margin-top: 48px; display: flex; flex-direction: column; gap: 16px; }
+
+button.btn {
+  font-family: inherit;
+  font-size: 18px;
+  letter-spacing: 0.15em;
+  background: transparent;
+  color: #cfcfcf;
+  border: 1px solid #444;
+  padding: 12px 36px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+button.btn:hover { border-color: #e8b23a; color: #e8b23a; background: rgba(232,178,58,0.06); }
+button.btn:disabled { opacity: 0.3; cursor: default; }
+
+/* ── Intro de nuit ── */
+#nuit-intro .nuit-titre { font-size: clamp(36px, 7vw, 72px); letter-spacing: 0.2em; color: #ddd; }
+#nuit-intro .nuit-heure { margin-top: 10px; font-size: 22px; color: #888; }
+#nuit-intro .nuit-lore { margin-top: 34px; max-width: 560px; color: #9a8; font-style: italic; line-height: 1.7; }
+
+/* ── HUD ── */
+#hud { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
+#hud > * { pointer-events: auto; }
+#hud-heure {
+  position: absolute; top: 16px; right: 20px;
+  font-size: 26px; color: #ddd; text-shadow: 0 0 6px #000;
+}
+#hud-cible {
+  position: absolute; top: 48px; right: 20px;
+  font-size: 12px; color: #6a6a5a; letter-spacing: 0.1em;
+}
+#hud-nuit {
+  position: absolute; top: 68px; right: 20px;
+  font-size: 14px; color: #999; letter-spacing: 0.2em;
+}
+#hud-energie {
+  position: absolute; bottom: 18px; left: 20px;
+  font-size: 15px; color: #ddd; text-shadow: 0 0 6px #000;
+}
+#hud-energie .barre {
+  width: 160px; height: 12px;
+  border: 1px solid #666; margin-top: 6px;
+}
+#hud-energie .barre > div { height: 100%; background: #7fc46a; transition: width 0.3s linear; }
+#hud-usage { margin-top: 6px; display: flex; gap: 3px; }
+#hud-usage .pip { width: 12px; height: 12px; background: #333; border: 1px solid #555; }
+#hud-usage .pip.on { background: #e8b23a; }
+
+/* ── Boutons portes / lumières ── */
+.cote {
+  position: absolute; top: 50%;
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 10px;
+}
+#cote-g { left: 14px; }
+#cote-d { right: 14px; }
+.cote button {
+  font-family: inherit;
+  width: 84px; height: 52px;
+  font-size: 12px; letter-spacing: 0.08em;
+  background: rgba(20,20,20,0.85);
+  color: #bbb; border: 1px solid #555;
+  cursor: pointer;
+}
+.cote button.actif { background: #6e1616; color: #ffd9d9; border-color: #a33; }
+.cote button.lum.actif { background: #6e6216; color: #fff3c4; border-color: #aa8f2b; }
+
+/* ── Barre caméra + jingle ── */
+#barre-bas {
+  position: absolute; bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; gap: 14px;
+}
+#barre-bas button {
+  font-family: inherit;
+  padding: 10px 30px; font-size: 14px; letter-spacing: 0.15em;
+  background: rgba(20,20,20,0.85); color: #bbb;
+  border: 1px solid #555; cursor: pointer;
+}
+#barre-bas button:hover { border-color: #999; }
+#btn-jingle:disabled { opacity: 0.35; cursor: default; }
+
+/* ── Interface caméras ── */
+#cam-ui { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
+#cam-ui > * { pointer-events: auto; }
+#cam-nom {
+  position: absolute; top: 18px; left: 22px;
+  font-size: 20px; color: #cfe8cf; letter-spacing: 0.15em;
+  text-shadow: 0 0 8px rgba(120,255,120,0.4);
+}
+#cam-rec {
+  position: absolute; top: 48px; left: 22px;
+  font-size: 13px; color: #d33; letter-spacing: 0.2em;
+  animation: clignote 1.2s steps(2) infinite;
+}
+@keyframes clignote { 50% { opacity: 0; } }
+
+#cam-plan {
+  position: absolute; right: 16px; bottom: 70px;
+  width: 230px; padding: 10px;
+  background: rgba(5, 12, 5, 0.85);
+  border: 1px solid #2c4a2c;
+}
+#cam-plan .plan-titre { font-size: 11px; color: #6a8a6a; letter-spacing: 0.2em; text-align: center; margin-bottom: 8px; }
+#cam-plan svg { width: 100%; display: block; }
+#cam-plan g rect { fill: #0d1a0d; stroke: #2c4a2c; cursor: pointer; transition: fill 0.15s; }
+#cam-plan g:hover rect { fill: #142a14; }
+#cam-plan g.actif rect { fill: #274a27; stroke: #4a8a4a; }
+#cam-plan g.flash rect { fill: #4a2020; stroke: #a33; }
+#cam-plan text { fill: #9c9; font-size: 10px; text-anchor: middle; font-family: "Courier New", monospace; pointer-events: none; }
+#cam-plan .bureau { fill: #1a160c; stroke: #5a4a2a; }
+#cam-plan .toi { fill: #e8b23a; font-size: 9px; }
+
+/* statique caméra */
+#statique {
+  position: fixed; inset: 0; z-index: 15;
+  pointer-events: none;
+  opacity: 0;
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 3px);
+  mix-blend-mode: screen;
+}
+#statique.cam { opacity: 0.5; animation: bruit 0.25s steps(3) infinite; }
+#statique.fort { opacity: 1; background: #888; animation: bruit 0.08s steps(2) infinite; }
+@keyframes bruit {
+  0% { transform: translateY(0); filter: brightness(1); }
+  50% { transform: translateY(-2px); filter: brightness(1.6); }
+  100% { transform: translateY(1px); filter: brightness(0.8); }
+}
+
+/* teinte verte caméra */
+#teinte-cam {
+  position: fixed; inset: 0; z-index: 14; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(40,80,40,0.10), rgba(0,20,0,0.45));
+  display: none;
+}
+#teinte-cam.on { display: block; }
+
+/* ── Fragments ── */
+.carte-fragment {
+  max-width: 520px;
+  border: 1px solid #5a4a2a;
+  background: #120e08;
+  padding: 28px 32px;
+  margin-top: 26px;
+}
+.carte-fragment .frag-titre { color: #e8b23a; letter-spacing: 0.1em; font-size: 16px; }
+.carte-fragment .frag-texte { margin-top: 14px; color: #b5a98f; line-height: 1.8; font-style: italic; }
+
+#liste-fragments {
+  margin-top: 24px; max-width: 640px; width: 100%;
+  max-height: 60vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 10px;
+  text-align: left;
+}
+#liste-fragments .frag {
+  border: 1px solid #333; padding: 14px 18px; background: #0c0c0c;
+}
+#liste-fragments .frag.trouve { border-color: #5a4a2a; background: #120e08; }
+#liste-fragments .frag .t { color: #e8b23a; font-size: 14px; }
+#liste-fragments .frag .x { margin-top: 6px; color: #b5a98f; font-size: 13px; line-height: 1.6; }
+#liste-fragments .frag.verrou { color: #444; font-size: 14px; }
+
+/* ── Game over / victoire / fins ── */
+#gameover h2 { font-size: clamp(30px, 6vw, 56px); color: #b03030; letter-spacing: 0.25em; }
+#victoire h2 { font-size: clamp(40px, 8vw, 80px); color: #cfe8cf; letter-spacing: 0.15em; }
+.fin-texte {
+  max-width: 620px; margin-top: 30px;
+  color: #cbbfa8;
+  line-height: 2; font-size: 17px; font-style: italic;
+  white-space: pre-line;
+}
+#fin-secrete { background: radial-gradient(ellipse at center, #1a1408, #000 75%); }
+#fin-secrete .fin-texte { color: #e8d9b0; text-shadow: 0 0 12px rgba(232,178,58,0.25); }
+
+.overlay .boutons-bas { margin-top: 40px; display: flex; gap: 16px; }
+
+/* petit texte d'aide en jeu */
+#aide {
+  position: absolute; bottom: 64px; left: 50%; transform: translateX(-50%);
+  font-size: 12px; color: #555; letter-spacing: 0.1em;
+}
+
+/* ── Cinématique ── */
+#cinematique { cursor: pointer; }
+#cinematique .cine-texte {
+  max-width: 640px;
+  min-height: 200px;
+  font-size: clamp(16px, 2.6vw, 21px);
+  line-height: 2.1;
+  color: #b8b4a4;
+  white-space: pre-line;
+  text-align: left;
+}
+#cinematique .cine-suite {
+  margin-top: 40px; font-size: 12px; color: #4a4a4a;
+  letter-spacing: 0.25em;
+  animation: clignote 2s steps(2) infinite;
+}
+#btn-passer {
+  position: absolute; top: 18px; right: 18px;
+  font-size: 12px; padding: 8px 18px;
+}
+
+/* ── Console de haut-parleurs ── */
+#console-sons {
+  position: absolute; left: 16px; bottom: 70px;
+  width: 190px; padding: 10px;
+  background: rgba(5, 12, 5, 0.85);
+  border: 1px solid #2c4a2c;
+  display: flex; flex-direction: column; gap: 6px;
+}
+#console-sons .con-titre { font-size: 11px; color: #6a8a6a; letter-spacing: 0.15em; text-align: center; margin-bottom: 2px; }
+#console-sons button {
+  font-family: inherit; font-size: 12px;
+  padding: 9px 6px;
+  background: #0d1a0d; color: #9c9;
+  border: 1px solid #2c4a2c; cursor: pointer;
+}
+#console-sons button:hover { background: #142a14; }
+#console-sons button:disabled { opacity: 0.35; cursor: default; }
+
+/* ── Apparition du visage ── */
+#visage {
+  position: fixed; inset: 0; z-index: 40;
+  background: #000;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+#visage img {
+  max-width: 90vw; max-height: 95vh;
+  filter: grayscale(1) contrast(1.6) brightness(0.75);
+  animation: tremble 0.09s steps(2) infinite;
+}
+@keyframes tremble {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(4px, -3px) scale(1.02); }
+  100% { transform: translate(-3px, 2px) scale(1); }
+}
+
+@media (max-width: 700px) {
+  .cote button { width: 64px; height: 44px; font-size: 10px; }
+  #cam-plan { width: 160px; bottom: 64px; }
+  #barre-bas button { padding: 8px 16px; font-size: 12px; }
+}

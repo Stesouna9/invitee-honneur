@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>L'INVITÉE D'HONNEUR — Cinq nuits chez Lys</title>
+  <meta name="description" content="Jeu d'horreur 3D. Cinq nuits de garde dans un fast-food abandonné. Elles attendent l'invitée d'honneur.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div id="teinte-cam"></div>
+  <div id="statique"></div>
+
+  <!-- HUD en jeu -->
+  <div id="hud" class="hidden">
+    <div id="hud-heure">00:00</div>
+    <div id="hud-cible">tenir jusqu'à 06:00</div>
+    <div id="hud-nuit">NUIT 1</div>
+    <div id="hud-energie">
+      ÉNERGIE <span id="energie-pct">100%</span>
+      <div class="barre"><div id="energie-barre" style="width:100%"></div></div>
+      <div id="hud-usage">
+        <div class="pip"></div><div class="pip"></div><div class="pip"></div><div class="pip"></div>
+      </div>
+    </div>
+
+    <div class="cote" id="cote-g">
+      <button id="btn-porte-g">PORTE</button>
+      <button id="btn-lum-g" class="lum">LUMIÈRE</button>
+    </div>
+    <div class="cote" id="cote-d">
+      <button id="btn-porte-d">PORTE</button>
+      <button id="btn-lum-d" class="lum">LUMIÈRE</button>
+    </div>
+
+    <div id="barre-bas">
+      <button id="btn-cam">📹 CAMÉRAS</button>
+      <button id="btn-jingle">♪ JINGLE</button>
+    </div>
+    <div id="aide">← → regarder · ESPACE caméras · 1-7 choisir caméra · A / P portes · Z / M lumières · J jingle</div>
+  </div>
+
+  <!-- UI caméras -->
+  <div id="cam-ui" class="hidden">
+    <div id="cam-nom">CAM 1 — SALLE</div>
+    <div id="cam-rec">● REC</div>
+    <div id="cam-plan">
+      <div class="plan-titre">CHEZ LYS — PLAN</div>
+      <svg viewBox="0 0 220 205" id="plan-svg">
+        <g data-cam="cuisine"><rect x="8" y="8" width="64" height="42"/><text x="40" y="32">3·CUISINE</text></g>
+        <g data-cam="comptoir"><rect x="78" y="8" width="72" height="42"/><text x="114" y="32">2·COMPTOIR</text></g>
+        <g data-cam="anniv"><rect x="8" y="58" width="64" height="56"/><text x="40" y="88">5·ANNIV.</text></g>
+        <g data-cam="salle"><rect x="78" y="58" width="72" height="64"/><text x="114" y="92">1·SALLE</text></g>
+        <g data-cam="aire"><rect x="156" y="58" width="56" height="56"/><text x="184" y="88">4·JEUX</text></g>
+        <g data-cam="couloirG"><rect x="84" y="128" width="26" height="48"/><text x="97" y="155">6</text></g>
+        <g data-cam="couloirD"><rect x="118" y="128" width="26" height="48"/><text x="131" y="155">7</text></g>
+        <rect x="86" y="180" width="56" height="20" class="bureau"/>
+        <text x="114" y="194" class="toi">BUREAU</text>
+      </svg>
+    </div>
+    <div id="console-sons">
+      <div class="con-titre">HAUT-PARLEURS — <span id="con-salle">SALLE</span></div>
+      <button id="son-chanson">♫ CHANSON</button>
+      <button id="son-annonce">📢 ANNONCE</button>
+      <button id="son-carillon">🔔 CARILLON</button>
+    </div>
+  </div>
+
+  <!-- apparition (photo optionnelle : assets/visage.jpg) -->
+  <div id="visage" class="hidden"><img alt=""></div>
+
+  <!-- Menu principal -->
+  <div id="menu" class="overlay">
+    <h1>L'INVITÉE <span>D'HONNEUR</span></h1>
+    <div class="sous-titre">CINQ NUITS CHEZ LYS</div>
+    <div class="boutons">
+      <button class="btn" id="btn-nouvelle">NOUVELLE PARTIE</button>
+      <button class="btn hidden" id="btn-continuer">CONTINUER — NUIT 1</button>
+      <button class="btn" id="btn-fragments">FRAGMENTS</button>
+    </div>
+  </div>
+
+  <!-- Écran fragments -->
+  <div id="ecran-fragments" class="overlay hidden">
+    <h2 style="color:#e8b23a; letter-spacing:0.2em;">FRAGMENTS</h2>
+    <div id="liste-fragments"></div>
+    <div class="boutons-bas"><button class="btn" id="btn-fermer-fragments">RETOUR</button></div>
+  </div>
+
+  <!-- Cinématique d'ouverture -->
+  <div id="cinematique" class="overlay hidden">
+    <div class="cine-texte"></div>
+    <div class="cine-suite">cliquer pour continuer</div>
+    <button class="btn" id="btn-passer">PASSER ›</button>
+  </div>
+
+  <!-- Intro de nuit -->
+  <div id="nuit-intro" class="overlay hidden">
+    <div class="nuit-titre">NUIT 1</div>
+    <div class="nuit-heure">00:00</div>
+    <div class="nuit-lore"></div>
+  </div>
+
+  <!-- Game over -->
+  <div id="gameover" class="overlay hidden">
+    <h2>IL TE CHERCHE ENCORE</h2>
+    <div class="carte-fragment hidden" id="frag-mort">
+      <div class="frag-titre"></div>
+      <div class="frag-texte"></div>
+    </div>
+    <div class="boutons-bas">
+      <button class="btn" id="btn-reessayer">RÉESSAYER</button>
+      <button class="btn" id="btn-menu-1">MENU</button>
+    </div>
+  </div>
+
+  <!-- Victoire de nuit -->
+  <div id="victoire" class="overlay hidden">
+    <h2>06:00</h2>
+    <div class="carte-fragment hidden" id="frag-nuit">
+      <div class="frag-titre"></div>
+      <div class="frag-texte"></div>
+    </div>
+    <div class="boutons-bas">
+      <button class="btn" id="btn-nuit-suivante">NUIT SUIVANTE</button>
+      <button class="btn" id="btn-menu-2">MENU</button>
+    </div>
+  </div>
+
+  <!-- Fin normale -->
+  <div id="fin-normale" class="overlay hidden">
+    <h2 style="color:#cfe8cf; letter-spacing:0.2em;">LA DERNIÈRE NUIT</h2>
+    <div class="fin-texte"></div>
+    <div class="boutons-bas"><button class="btn" id="btn-menu-3">MENU</button></div>
+  </div>
+
+  <!-- Fin secrète -->
+  <div id="fin-secrete" class="overlay hidden">
+    <div class="fin-texte"></div>
+    <div class="boutons-bas"><button class="btn" id="btn-menu-4">MENU</button></div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
